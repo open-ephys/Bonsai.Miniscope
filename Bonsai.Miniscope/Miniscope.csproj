@@ -34,9 +34,6 @@
       <HintPath>..\packages\Bonsai.Core.2.3.0\lib\net45\Bonsai.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Bonsai.Design">
-      <HintPath>..\..\..\bonsai\Bonsai.Design\obj\Debug\Bonsai.Design.dll</HintPath>
-    </Reference>
     <Reference Include="OpenCV.Net">
       <HintPath>..\packages\OpenCV.Net.3.3.1\lib\net40\OpenCV.Net.dll</HintPath>
     </Reference>
