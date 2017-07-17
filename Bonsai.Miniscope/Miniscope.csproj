@@ -6,8 +6,8 @@
     <ProjectGuid>{C82C8D0A-3654-409C-8FBA-5BC222301CBA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UCLAMiniscope</RootNamespace>
-    <AssemblyName>UCLAMiniscope</AssemblyName>
+    <RootNamespace>Miniscope</RootNamespace>
+    <AssemblyName>Miniscope</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -33,9 +33,6 @@
     <Reference Include="Bonsai.Core, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Bonsai.Core.2.3.0\lib\net45\Bonsai.Core.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="Bonsai.Design">
-      <HintPath>..\..\..\bonsai\Bonsai.Design\obj\Debug\Bonsai.Design.dll</HintPath>
     </Reference>
     <Reference Include="OpenCV.Net">
       <HintPath>..\packages\OpenCV.Net.3.3.1\lib\net40\OpenCV.Net.dll</HintPath>
@@ -75,6 +72,7 @@
     <StartProgram>$(registry:HKEY_CURRENT_USER\Software\Goncalo Lopes\Bonsai@InstallDir)Bonsai.exe</StartProgram>
     <StartArguments>--lib:"$(TargetDir)."</StartArguments>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
