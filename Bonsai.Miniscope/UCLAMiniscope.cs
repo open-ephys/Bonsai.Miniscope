@@ -46,6 +46,7 @@ namespace Bonsai.Miniscope
         // State
         IObservable<IplImage> source;
         readonly object captureLock = new object();
+        //readonly CapturePropertyCollection captureProperties = new CapturePropertyCollection();
 
         // Functor
         public UCLAMiniscope()
@@ -58,23 +59,37 @@ namespace Bonsai.Miniscope
                     {
                         using (var capture = Capture.CreateCameraCapture(Index))
                         {
+                            //foreach (var setting in captureProperties)
+                            //{
+                             //   capture.SetProperty(setting.Property, setting.Value);
+                            //}
+                            //captureProperties.Capture = capture;
+
                             capture.SetProperty(CaptureProperty.Saturation, (double)FramesPerSecond);
-
-                            while (!cancellationToken.IsCancellationRequested)
+                            try
                             {
-                                // Runtime settable properties
-                                capture.SetProperty(CaptureProperty.Hue, LEDBrightness);
-                                capture.SetProperty(CaptureProperty.Gain, SensorGain);
-                                capture.SetProperty(CaptureProperty.Brightness, Exposure);
-
-                                var image = capture.QueryFrame();
-                                if (image == null)
+                                while (!cancellationToken.IsCancellationRequested)
                                 {
-                                    observer.OnCompleted();
-                                    break;
+                                    // Runtime settable properties
+                                    capture.SetProperty(CaptureProperty.Hue, LEDBrightness);
+                                    capture.SetProperty(CaptureProperty.Gain, SensorGain);
+                                    capture.SetProperty(CaptureProperty.Brightness, Exposure);
+
+                                    var image = capture.QueryFrame();
+                                    if (image == null)
+                                    {
+                                        observer.OnCompleted();
+                                        break;
+                                    }
+                                    else observer.OnNext(image.Clone());
                                 }
-                                else observer.OnNext(image.Clone());
                             }
+                            finally
+                            {
+                                capture.Close();
+                                //captureProperties.Capture = null;
+                            }
+
                         }
                     }
                 },
@@ -85,6 +100,12 @@ namespace Bonsai.Miniscope
             .PublishReconnectable()
             .RefCount();
         }
+
+        //[Description("Specifies the set of capture properties assigned to the camera.")]
+       // public CapturePropertyCollection CaptureProperties
+        //{
+        //    get { return captureProperties; }
+        //}
 
         public override IObservable<IplImage> Generate()
         {
