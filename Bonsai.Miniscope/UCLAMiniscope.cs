@@ -14,6 +14,9 @@ namespace Bonsai.Miniscope
         [Description("The index of the camera from which to acquire images.")]
         public int Index { get; set; } = 0;
 
+        [Description("The index of the camera from which to acquire images.")]
+        public bool RecordingFramePulse { get; set; } = false;
+
         [Range(0, 255)]
         [Editor(DesignTypes.SliderEditor, typeof(UITypeEditor))]
         [Description("LED Brightness.")]
@@ -30,9 +33,8 @@ namespace Bonsai.Miniscope
         [Description("The sensor gain.")]
         public double SensorGain { get; set; } = 16;
 
-        private double lastLEDBrightness;
-        private double lastExposure;
-        private double lastSensorGain;
+        const int RecordStart = 0x01;
+        const int RecordEnd = 0x02;
 
         public enum FPS
         {
@@ -50,30 +52,29 @@ namespace Bonsai.Miniscope
         // State
         IObservable<IplImage> source;
         readonly object captureLock = new object();
-        //readonly CapturePropertyCollection captureProperties = new CapturePropertyCollection();
 
         // Functor
         public UCLAMiniscope()
         {
-            lastLEDBrightness = LEDBrightness;
-            lastExposure = Exposure;
-            lastSensorGain = SensorGain;
-
             source = Observable.Create<IplImage>((observer, cancellationToken) =>
             {
                 return Task.Factory.StartNew(() =>
                 {
                     lock (captureLock)
                     {
+                        var lastRecordingFramePulse = false;
+                        var lastLEDBrightness = LEDBrightness;
+                        var lastExposure = Exposure;
+                        var lastSensorGain = SensorGain;
                         using (var capture = Capture.CreateCameraCapture(Index))
                         {
                             try
                             {
                                 capture.SetProperty(CaptureProperty.Saturation, (double)FramesPerSecond);
-
                                 capture.SetProperty(CaptureProperty.Hue, LEDBrightness);
                                 capture.SetProperty(CaptureProperty.Gain, SensorGain);
                                 capture.SetProperty(CaptureProperty.Brightness, Exposure);
+                                capture.SetProperty(CaptureProperty.Saturation, RecordEnd);
                                 while (!cancellationToken.IsCancellationRequested)
                                 {
                                     // Runtime settable properties
@@ -92,6 +93,11 @@ namespace Bonsai.Miniscope
                                         capture.SetProperty(CaptureProperty.Brightness, Exposure);
                                         lastExposure = Exposure;
                                     }
+                                    if (RecordingFramePulse != lastRecordingFramePulse)
+                                    {
+                                        capture.SetProperty(CaptureProperty.Saturation, RecordingFramePulse ? RecordStart : RecordEnd);
+                                        lastRecordingFramePulse = RecordingFramePulse;
+                                    }
 
                                     var image = capture.QueryFrame();
 
@@ -106,7 +112,6 @@ namespace Bonsai.Miniscope
                             finally
                             {
                                 capture.Close();
-                                //captureProperties.Capture = null;
                             }
 
                         }
@@ -119,12 +124,6 @@ namespace Bonsai.Miniscope
             .PublishReconnectable()
             .RefCount();
         }
-
-        //[Description("Specifies the set of capture properties assigned to the camera.")]
-       // public CapturePropertyCollection CaptureProperties
-        //{
-        //    get { return captureProperties; }
-        //}
 
         public override IObservable<IplImage> Generate()
         {
