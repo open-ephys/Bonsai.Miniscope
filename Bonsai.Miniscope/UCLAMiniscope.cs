@@ -14,7 +14,7 @@ namespace Bonsai.Miniscope
         [Description("The index of the camera from which to acquire images.")]
         public int Index { get; set; } = 0;
 
-        [Description("The index of the camera from which to acquire images.")]
+        [Description("Indicates whether to activate the hardware frame pulse output.")]
         public bool RecordingFramePulse { get; set; } = false;
 
         [Range(0, 255)]
