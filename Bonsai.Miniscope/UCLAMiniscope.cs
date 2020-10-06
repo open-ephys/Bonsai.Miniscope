@@ -7,7 +7,7 @@ using System.Drawing.Design;
 
 namespace Bonsai.Miniscope
 {
-    [Description("Produces a video sequence of images acquired from a UCLA Miniscope.")]
+    [Description("Produces a video sequence acquired from a UCLA Miniscope V3 (legacy DAQ firmware).")]
     public class UCLAMiniscope : Source<IplImage>
     {
         // Settings

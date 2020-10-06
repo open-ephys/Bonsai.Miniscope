@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Bonsai.Miniscope": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\open-ephys\\AppData\\Local\\Bonsai\\Bonsai64.exe",
+      "commandLineArgs": "--lib:$(TargetDir)."
+    }
+  }
+}
