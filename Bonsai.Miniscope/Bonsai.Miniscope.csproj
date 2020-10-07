@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>1.2.0</Version>
+    <Version>1.2.2</Version>
     <TargetFramework>net472</TargetFramework>
     <Description>Bonsai package providing elements for acquiring and processing miniscope data</Description>
     <Copyright>Jonathan P. Newman</Copyright>
@@ -9,6 +9,7 @@
     <PackageProjectUrl>https://github.com/jonnew/Bonsai.Miniscope</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jonnew/Bonsai.Miniscope</RepositoryUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageTags>Bonsai Miniscope open-ephys ephys neuroscience calcium imaging</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

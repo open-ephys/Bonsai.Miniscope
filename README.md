@@ -6,10 +6,8 @@ It contains the following nodes:
 - `UCLAMiniscope`: UCLA Miniscope V3 using legacy DAQ firmware. Use this if you have an old DAQ box and have not updated firmware recently.
 - `UCLAMiniscopeV3`: UCLA Miniscope V3 using updated DAQ box and firmware. Use this if you are also using the V4 scope.
 - `UCLAMiniscopeV4`: UCLA Miniscope V4 with integrated IMU.
-    - **NOTE** The jumpy, corrupt IMU data is a known issue and is also present in the official Miniscope software, it is just filtered and dumped before it is shown on the screen. 
-      Doing this is against the philosophy of Bonsai (source nodes should be as pure a representation of hardware as possible), so we have chosen to expose the whole data stream. 
-      I've submitted an issue requesting a firmware fix for this issue. In the meantime, filtering (e.g. by making sure the norm of the quaternion is always the same value) can be done 
-      downstream.
+    - **NOTE** On some V4 miniscopes, the IMU data will appear jumpy with some or all of the components taking the same value. This is a known issue, and has been addressed in later versions 
+      of the Miniscope hardware. See [this issue](https://github.com/Aharoni-Lab/Miniscope-DAQ-QT-Software/issues/23) for more information.
 
 Feel free to submit an issue or PR if you want to add your Miniscope to this package.
 

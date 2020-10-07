@@ -146,7 +146,7 @@ namespace Bonsai.Miniscope
                             }
                             finally
                             {
-                                capture.SetProperty(CaptureProperty.Saturation, 01);
+                                capture.SetProperty(CaptureProperty.Saturation, 0);
                                 capture.Close();
                             }
 

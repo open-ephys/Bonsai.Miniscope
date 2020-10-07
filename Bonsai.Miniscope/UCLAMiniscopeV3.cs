@@ -133,12 +133,6 @@ namespace Bonsai.Miniscope
                                     // Capture frame
                                     var image = capture.QueryFrame();
 
-                                    // Get BNO data
-                                    var w = (ushort)capture.GetProperty(CaptureProperty.Saturation);
-                                    var x = (ushort)capture.GetProperty(CaptureProperty.Hue);
-                                    var y = (ushort)capture.GetProperty(CaptureProperty.Gain);
-                                    var z = (ushort)capture.GetProperty(CaptureProperty.Brightness);
-
                                     if (image == null)
                                     {
                                         observer.OnCompleted();
@@ -152,7 +146,7 @@ namespace Bonsai.Miniscope
                             }
                             finally
                             {
-                                capture.SetProperty(CaptureProperty.Saturation, 01);
+                                capture.SetProperty(CaptureProperty.Saturation, 0);
                                 capture.Close();
                             }
 
