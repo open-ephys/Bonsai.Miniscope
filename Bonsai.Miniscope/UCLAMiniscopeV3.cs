@@ -8,6 +8,20 @@ using System.Collections.Generic;
 
 namespace Bonsai.Miniscope
 {
+    public enum GainV3
+    {
+        LOW = 225,
+        MED = 228,
+        HIGH = 36
+    };
+
+    public enum FPSV3
+    {
+        FPS10,
+        FPS30,
+        FPS60
+    };
+
     [Description("Produces a video sequence acquired from a UCLA Miniscope V3 (updated DAQ firmware).")]
     public class UCLAMiniscopeV3 : Source<IplImage>
     {
@@ -24,25 +38,11 @@ namespace Bonsai.Miniscope
         [Description("LED brightness.")]
         public double LEDBrightness { get; set; } = 0;
 
-        public enum Gain
-        {
-            LOW = 225,
-            MED = 228,
-            HIGH = 36
-        };
-
         [Description("The image sensor gain.")]
-        public Gain SensorGain { get; set; } = Gain.LOW;
-
-        public enum FPS
-        {
-            FPS10,
-            FPS30,
-            FPS60 
-        };
+        public GainV3 SensorGain { get; set; } = GainV3.LOW;
 
         [Description("Frames per second.")]
-        public FPS FramesPerSecond { get; set; } = FPS.FPS30;
+        public FPSV3 FramesPerSecond { get; set; } = FPSV3.FPS30;
 
         // State
         IObservable<IplImage> source;
@@ -96,15 +96,15 @@ namespace Bonsai.Miniscope
                                     if (FramesPerSecond != lastFPS || !initialized)
                                     {
                                         switch (FramesPerSecond) {
-                                            case FPS.FPS10:
+                                            case FPSV3.FPS10:
                                                 Helpers.SendConfig(capture, Helpers.CreateCommand(184, 5, 2, 238, 4, 226));
                                                 Helpers.SendConfig(capture, Helpers.CreateCommand(184, 11, 6, 184));
                                                 break;
-                                            case FPS.FPS30:
+                                            case FPSV3.FPS30:
                                                 Helpers.SendConfig(capture, Helpers.CreateCommand(184, 5, 0, 94, 2, 33));
                                                 Helpers.SendConfig(capture, Helpers.CreateCommand(184, 11, 3, 232));
                                                 break;
-                                            case FPS.FPS60:
+                                            case FPSV3.FPS60:
                                                 Helpers.SendConfig(capture, Helpers.CreateCommand(184, 5, 0, 93, 0, 33));
                                                 Helpers.SendConfig(capture, Helpers.CreateCommand(184, 11, 1, 244));
                                                 break;
@@ -115,13 +115,13 @@ namespace Bonsai.Miniscope
                                     {
                                         switch (SensorGain)
                                         {
-                                            case Gain.LOW:
+                                            case GainV3.LOW:
                                                 Helpers.SendConfig(capture, Helpers.CreateCommand(184, 53, 0, 16));
                                                 break;
-                                            case Gain.MED:
+                                            case GainV3.MED:
                                                 Helpers.SendConfig(capture, Helpers.CreateCommand(184, 53, 0, 32));
                                                 break;
-                                            case Gain.HIGH:
+                                            case GainV3.HIGH:
                                                 Helpers.SendConfig(capture, Helpers.CreateCommand(184, 53, 0, 64));
                                                 break;
                                         }

@@ -8,6 +8,22 @@ using System.Collections.Generic;
 
 namespace Bonsai.Miniscope
 {
+    public enum GainV4
+    {
+        LOW = 225,
+        MED = 228,
+        HIGH = 36
+    };
+
+    public enum FPSV4
+    {
+        FPS10 = 39 & 0x000000FF | 16 << 8,
+        FPS15 = 26 & 0x000000FF | 11 << 8,
+        FPS20 = 19 & 0x000000FF | 136 << 8,
+        FPS25 = 15 & 0x000000FF | 160 << 8,
+        FPS30 = 12 & 0x000000FF | 228 << 8,
+    };
+
     [Description("Produces a combined image/IMU sequence acquired from a UCLA Miniscope V4.")]
     public class UCLAMiniscopeV4 : Source<V4Frame>
     {
@@ -29,27 +45,11 @@ namespace Bonsai.Miniscope
         [Description("Electro-wetting lens focus.")]
         public double EWL { get; set; } = 0;
 
-        public enum Gain
-        {
-            LOW = 225,
-            MED = 228,
-            HIGH = 36
-        };
-
         [Description("The image sensor gain.")]
-        public Gain SensorGain { get; set; } = Gain.LOW;
-
-        public enum FPS
-        {
-            FPS10 = 39 & 0x000000FF | 16 << 8,
-            FPS15 = 26 & 0x000000FF | 11 << 8,
-            FPS20 = 19 & 0x000000FF | 136 << 8,
-            FPS25 = 15 & 0x000000FF | 160 << 8,
-            FPS30 = 12 & 0x000000FF | 228 << 8,
-        };
+        public GainV4 SensorGain { get; set; } = GainV4.LOW;
 
         [Description("Frames per second.")]
-        public FPS FramesPerSecond { get; set; } = FPS.FPS30;
+        public FPSV4 FramesPerSecond { get; set; } = FPSV4.FPS30;
 
         // State
         IObservable<V4Frame> source;

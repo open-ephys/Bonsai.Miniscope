@@ -7,6 +7,16 @@ using System.Drawing.Design;
 
 namespace Bonsai.Miniscope
 {
+    public enum FPS
+    {
+        FPS5 = 0x11,
+        FPS10 = 0x12,
+        FPS15 = 0x13,
+        FPS20 = 0x14,
+        FPS30 = 0x15,
+        FPS60 = 0x16
+    };
+
     [Description("Produces a video sequence acquired from a UCLA Miniscope V3 (legacy DAQ firmware).")]
     public class UCLAMiniscope : Source<IplImage>
     {
@@ -35,16 +45,6 @@ namespace Bonsai.Miniscope
 
         const int RecordStart = 0x01;
         const int RecordEnd = 0x02;
-
-        public enum FPS
-        {
-            FPS5 = 0x11,
-            FPS10 = 0x12,
-            FPS15 = 0x13,
-            FPS20 = 0x14,
-            FPS30 = 0x15,
-            FPS60 = 0x16
-        };
 
         [Description("Frames per second.")]
         public FPS FramesPerSecond { get; set; } = FPS.FPS30;
