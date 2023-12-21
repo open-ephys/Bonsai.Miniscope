@@ -1,10 +1,10 @@
-﻿using System;
-using OpenCV.Net;
-using System.Reactive.Linq;
+﻿using OpenCV.Net;
+using System;
 using System.ComponentModel;
-using System.Threading.Tasks;
 using System.Drawing.Design;
-using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+
 
 namespace Bonsai.Miniscope
 {
@@ -54,6 +54,16 @@ namespace Bonsai.Miniscope
         // State
         IObservable<V4Frame> source;
         readonly object captureLock = new object();
+
+
+        // Camera regiser abuse
+        //
+        // CaptureProperty.Saturation -> Quaternion W and start acqusition
+        // CaptureProperty.Hue -> Quaternion X
+        // CaptureProperty.Gain -> Quaternion Y
+        // CaptureProperty.Brightness -> Quaternion Z
+        // CaptureProperty.Gamma -> Inverted state of Trigger Input (3.3 -> Gamma = 0, 0V -> Gamma != 0)
+        // CaptureProperty.Contrast -> DAQ Frame number
 
         public UCLAMiniscopeV4()
         {
@@ -124,28 +134,38 @@ namespace Bonsai.Miniscope
 
                                     initialized = true;
 
-                                    // Capture frame
-                                    var image = capture.QueryFrame();
+                                    // Check to see state of trigger input
+                                    var gated = capture.GetProperty(CaptureProperty.Gamma) == 0;
 
-                                    // Get BNO data
-                                    var w = (ushort)capture.GetProperty(CaptureProperty.Saturation);
-                                    var x = (ushort)capture.GetProperty(CaptureProperty.Hue);
-                                    var y = (ushort)capture.GetProperty(CaptureProperty.Gain);
-                                    var z = (ushort)capture.GetProperty(CaptureProperty.Brightness);
+                                    if (gated)
+                                    {
+                                        // Capture frame
+                                        var image = capture.QueryFrame();
 
-                                    if (image == null)
-                                    {
-                                        observer.OnCompleted();
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        observer.OnNext(new V4Frame(image.Clone(), new ushort[] { w, x, y, z }));
+                                        // Get latest hardware frame count
+                                        var frameNumber = (int)capture.GetProperty(CaptureProperty.Contrast);
+
+
+                                        // Get BNO data
+                                        var w = (ushort)capture.GetProperty(CaptureProperty.Saturation);
+                                        var x = (ushort)capture.GetProperty(CaptureProperty.Hue);
+                                        var y = (ushort)capture.GetProperty(CaptureProperty.Gain);
+                                        var z = (ushort)capture.GetProperty(CaptureProperty.Brightness);
+
+                                        if (image == null)
+                                        {
+                                            observer.OnCompleted();
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            observer.OnNext(new V4Frame(image.Clone(), new ushort[] { w, x, y, z }, frameNumber));
+                                        }
                                     }
                                 }
                             }
                             finally
-                            {
+                            { 
                                 capture.SetProperty(CaptureProperty.Saturation, 0);
                                 capture.Close();
                             }

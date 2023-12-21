@@ -1,9 +1,9 @@
-﻿using System;
-using OpenCV.Net;
-using System.Reactive.Linq;
+﻿using OpenCV.Net;
+using System;
 using System.ComponentModel;
-using System.Threading.Tasks;
 using System.Drawing.Design;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace Bonsai.Miniscope
 {

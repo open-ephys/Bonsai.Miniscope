@@ -1,20 +1,18 @@
 ﻿using OpenCV.Net;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bonsai.Miniscope
 {
     public class V4Frame
     {
-        public V4Frame(IplImage image, ushort[] quaternion)
+        public V4Frame(IplImage image, ushort[] quaternion, int frameNumber)
         {
+            FrameNumber = frameNumber;
             Image = image;
             Quaternion = GetQuat(quaternion);
         }
 
+        public int FrameNumber { get; private set; }
         public IplImage Image { get; private set; }
         public Mat Quaternion { get; private set; }
 

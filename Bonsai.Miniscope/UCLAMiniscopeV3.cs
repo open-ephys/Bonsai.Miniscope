@@ -1,10 +1,9 @@
-﻿using System;
-using OpenCV.Net;
-using System.Reactive.Linq;
+﻿using OpenCV.Net;
+using System;
 using System.ComponentModel;
-using System.Threading.Tasks;
 using System.Drawing.Design;
-using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace Bonsai.Miniscope
 {
@@ -95,7 +94,8 @@ namespace Bonsai.Miniscope
                                     }
                                     if (FramesPerSecond != lastFPS || !initialized)
                                     {
-                                        switch (FramesPerSecond) {
+                                        switch (FramesPerSecond)
+                                        {
                                             case FPSV3.FPS10:
                                                 Helpers.SendConfig(capture, Helpers.CreateCommand(184, 5, 2, 238, 4, 226));
                                                 Helpers.SendConfig(capture, Helpers.CreateCommand(184, 11, 6, 184));
@@ -130,17 +130,22 @@ namespace Bonsai.Miniscope
 
                                     initialized = true;
 
-                                    // Capture frame
-                                    var image = capture.QueryFrame();
+                                    var gated = capture.GetProperty(CaptureProperty.Gamma) == 0;
 
-                                    if (image == null)
+                                    if (gated)
                                     {
-                                        observer.OnCompleted();
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        observer.OnNext(image.Clone());
+                                        // Capture frame
+                                        var image = capture.QueryFrame();
+
+                                        if (image == null)
+                                        {
+                                            observer.OnCompleted();
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            observer.OnNext(image.Clone());
+                                        }
                                     }
                                 }
                             }
