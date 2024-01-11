@@ -130,22 +130,17 @@ namespace Bonsai.Miniscope
 
                                     initialized = true;
 
-                                    var gated = capture.GetProperty(CaptureProperty.Gamma) == 0;
+                                    // Capture frame
+                                    var image = capture.QueryFrame();
 
-                                    if (gated)
+                                    if (image == null)
                                     {
-                                        // Capture frame
-                                        var image = capture.QueryFrame();
-
-                                        if (image == null)
-                                        {
-                                            observer.OnCompleted();
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            observer.OnNext(image.Clone());
-                                        }
+                                        observer.OnCompleted();
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        observer.OnNext(image.Clone());
                                     }
                                 }
                             }

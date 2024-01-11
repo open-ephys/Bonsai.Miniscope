@@ -5,16 +5,18 @@ namespace Bonsai.Miniscope
 {
     public class V4Frame
     {
-        public V4Frame(IplImage image, ushort[] quaternion, int frameNumber)
+        public V4Frame(IplImage image, ushort[] quaternion, int frameNumber, bool trigger)
         {
             FrameNumber = frameNumber;
             Image = image;
             Quaternion = GetQuat(quaternion);
+            Trigger = trigger;
         }
 
         public int FrameNumber { get; private set; }
         public IplImage Image { get; private set; }
         public Mat Quaternion { get; private set; }
+        public bool Trigger { get; private set; }
 
         Mat GetQuat(ushort[] sample)
         {

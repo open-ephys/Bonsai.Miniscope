@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
     <TargetFramework>net472</TargetFramework>
     <Description>Bonsai package providing elements for acquiring and processing miniscope data</Description>
     <Copyright>Jonathan P. Newman</Copyright>
@@ -12,6 +12,10 @@
     <PackageTags>Bonsai Miniscope open-ephys ephys neuroscience calcium imaging</PackageTags>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Kiloscope.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="Bonsai.Miniscope.svg" />

@@ -51,6 +51,11 @@ namespace Bonsai.Miniscope
         [Description("Frames per second.")]
         public FPSV4 FramesPerSecond { get; set; } = FPSV4.FPS30;
 
+        [Description("Turn off the LED when the trigger input is low. " +
+            "Note that this pin is low by default. Therefore, if it is not driven and " +
+            "this option is set to true, the LED will not turn on.")]
+        public bool LEDRespectsTrigger { get; set; } = false;
+
         // State
         IObservable<V4Frame> source;
         readonly object captureLock = new object();
@@ -107,18 +112,40 @@ namespace Bonsai.Miniscope
 
                                 while (!cancellationToken.IsCancellationRequested)
                                 {
-                                    // Runtime settable properties
-                                    if (LEDBrightness != lastLEDBrightness || !initialized)
+                                    // Get trigger input state
+                                    var gate = capture.GetProperty(CaptureProperty.Gamma) != 0;
+
+                                    if (LEDRespectsTrigger)
                                     {
-                                        Helpers.SendConfig(capture, Helpers.CreateCommand(32, 1, (byte)(255 - LEDBrightness)));
-                                        Helpers.SendConfig(capture, Helpers.CreateCommand(88, 0, 114, (byte)(255 - LEDBrightness)));
-                                        lastLEDBrightness = LEDBrightness;
+                                        if (!gate && lastLEDBrightness != 0)
+                                        {
+                                            Helpers.SendConfig(capture, Helpers.CreateCommand(32, 1, (byte)(255)));
+                                            Helpers.SendConfig(capture, Helpers.CreateCommand(88, 0, 114, (byte)(255)));
+                                            lastLEDBrightness = 0;
+                                        }
+                                        else if (gate && LEDBrightness != lastLEDBrightness || !initialized)
+                                        {
+                                            Helpers.SendConfig(capture, Helpers.CreateCommand(32, 1, (byte)(255 - LEDBrightness)));
+                                            Helpers.SendConfig(capture, Helpers.CreateCommand(88, 0, 114, (byte)(255 - LEDBrightness)));
+                                            lastLEDBrightness = LEDBrightness;
+                                        }
                                     }
+                                    else
+                                    {
+                                        if (LEDBrightness != lastLEDBrightness || !initialized)
+                                        {
+                                            Helpers.SendConfig(capture, Helpers.CreateCommand(32, 1, (byte)(255 - LEDBrightness)));
+                                            Helpers.SendConfig(capture, Helpers.CreateCommand(88, 0, 114, (byte)(255 - LEDBrightness)));
+                                            lastLEDBrightness = LEDBrightness;
+                                        }
+                                    }
+
                                     if (EWL != lastEWL || !initialized)
                                     {
                                         Helpers.SendConfig(capture, Helpers.CreateCommand(238, 8, (byte)(127 + EWL), 2));
                                         lastEWL = EWL;
                                     }
+
                                     if (FramesPerSecond != lastFPS || !initialized)
                                     {
                                         byte v0 = (byte)((int)FramesPerSecond & 0x00000FF);
@@ -126,6 +153,7 @@ namespace Bonsai.Miniscope
                                         Helpers.SendConfig(capture, Helpers.CreateCommand(32, 5, 0, 201, v0, v1));
                                         lastFPS = FramesPerSecond;
                                     }
+
                                     if (SensorGain != lastSensorGain || !initialized)
                                     {
                                         Helpers.SendConfig(capture, Helpers.CreateCommand(32, 5, 0, 204, 0, (byte)SensorGain));
@@ -134,38 +162,31 @@ namespace Bonsai.Miniscope
 
                                     initialized = true;
 
-                                    // Check to see state of trigger input
-                                    var gated = capture.GetProperty(CaptureProperty.Gamma) == 0;
+                                    // Capture frame
+                                    var image = capture.QueryFrame();
 
-                                    if (gated)
+                                    // Get latest hardware frame count
+                                    var frameNumber = (int)capture.GetProperty(CaptureProperty.Contrast);
+
+                                    // Get BNO data
+                                    var w = (ushort)capture.GetProperty(CaptureProperty.Saturation);
+                                    var x = (ushort)capture.GetProperty(CaptureProperty.Hue);
+                                    var y = (ushort)capture.GetProperty(CaptureProperty.Gain);
+                                    var z = (ushort)capture.GetProperty(CaptureProperty.Brightness);
+
+                                    if (image == null)
                                     {
-                                        // Capture frame
-                                        var image = capture.QueryFrame();
-
-                                        // Get latest hardware frame count
-                                        var frameNumber = (int)capture.GetProperty(CaptureProperty.Contrast);
-
-
-                                        // Get BNO data
-                                        var w = (ushort)capture.GetProperty(CaptureProperty.Saturation);
-                                        var x = (ushort)capture.GetProperty(CaptureProperty.Hue);
-                                        var y = (ushort)capture.GetProperty(CaptureProperty.Gain);
-                                        var z = (ushort)capture.GetProperty(CaptureProperty.Brightness);
-
-                                        if (image == null)
-                                        {
-                                            observer.OnCompleted();
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            observer.OnNext(new V4Frame(image.Clone(), new ushort[] { w, x, y, z }, frameNumber));
-                                        }
+                                        observer.OnCompleted();
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        observer.OnNext(new V4Frame(image.Clone(), new ushort[] { w, x, y, z }, frameNumber, gate));
                                     }
                                 }
                             }
                             finally
-                            { 
+                            {
                                 capture.SetProperty(CaptureProperty.Saturation, 0);
                                 capture.Close();
                             }
