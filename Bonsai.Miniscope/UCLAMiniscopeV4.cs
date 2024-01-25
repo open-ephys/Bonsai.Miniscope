@@ -187,6 +187,8 @@ namespace Bonsai.Miniscope
                             }
                             finally
                             {
+                                Helpers.SendConfig(capture, Helpers.CreateCommand(32, 1, 255));
+                                Helpers.SendConfig(capture, Helpers.CreateCommand(88, 0, 114, 255));
                                 capture.SetProperty(CaptureProperty.Saturation, 0);
                                 capture.Close();
                             }
