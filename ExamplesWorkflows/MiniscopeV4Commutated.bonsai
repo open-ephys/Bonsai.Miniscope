@@ -3,64 +3,59 @@
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xmlns:p1="clr-namespace:Bonsai.Miniscope;assembly=Bonsai.Miniscope"
                  xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
+                 xmlns:io="clr-namespace:Bonsai.IO;assembly=Bonsai.System"
                  xmlns:cv="clr-namespace:Bonsai.Vision;assembly=Bonsai.Vision"
                  xmlns:dsp="clr-namespace:Bonsai.Dsp;assembly=Bonsai.Dsp"
                  xmlns:wie="clr-namespace:Bonsai.Windows.Input;assembly=Bonsai.Windows.Input"
-                 xmlns:ipy="clr-namespace:Bonsai.Scripting.IronPython;assembly=Bonsai.Scripting.IronPython"
-                 xmlns:io="clr-namespace:Bonsai.IO;assembly=Bonsai.System"
+                 xmlns:p2="clr-namespace:Bonsai.Scripting.IronPython;assembly=Bonsai.Scripting.IronPython"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
     <Nodes>
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="p1:UCLAMiniscopeV4">
-          <p1:Index>0</p1:Index>
-          <p1:LEDBrightness>29.651162790697676</p1:LEDBrightness>
+          <p1:Index>1</p1:Index>
+          <p1:LEDBrightness>0</p1:LEDBrightness>
           <p1:EWL>0</p1:EWL>
           <p1:SensorGain>LOW</p1:SensorGain>
           <p1:FramesPerSecond>FPS30</p1:FramesPerSecond>
           <p1:LEDRespectsTrigger>false</p1:LEDRespectsTrigger>
         </Combinator>
       </Expression>
-      <Expression xsi:type="Annotation">
-        <Name>Hardware Trigger</Name>
-        <Text><![CDATA[Uncomment to gate data based on Trigger Input to the miniscope DAQ.]]></Text>
+      <Expression xsi:type="MemberSelector">
+        <Selector>FrameNumber,Trigger</Selector>
       </Expression>
-      <Expression xsi:type="Disable">
-        <Builder xsi:type="rx:Condition">
-          <Workflow>
-            <Nodes>
-              <Expression xsi:type="WorkflowInput">
-                <Name>Source1</Name>
-              </Expression>
-              <Expression xsi:type="MemberSelector">
-                <Selector>Trigger</Selector>
-              </Expression>
-              <Expression xsi:type="WorkflowOutput" />
-            </Nodes>
-            <Edges>
-              <Edge From="0" To="1" Label="Source1" />
-              <Edge From="1" To="2" Label="Source1" />
-            </Edges>
-          </Workflow>
-        </Builder>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:Timestamp" />
+      </Expression>
+      <Expression xsi:type="io:CsvWriter">
+        <io:FileName>minicam-frame-gate_.csv</io:FileName>
+        <io:Delimiter>,</io:Delimiter>
+        <io:Append>false</io:Append>
+        <io:Overwrite>false</io:Overwrite>
+        <io:Suffix>Timestamp</io:Suffix>
+        <io:IncludeHeader>false</io:IncludeHeader>
+        <io:Selector>Timestamp,Value.Item1,Value.Item2</io:Selector>
       </Expression>
       <Expression xsi:type="MemberSelector">
         <Selector>Image</Selector>
       </Expression>
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="cv:VideoWriter">
-          <cv:FileName>video_.avi</cv:FileName>
+          <cv:FileName>minicam_.avi</cv:FileName>
           <cv:Suffix>Timestamp</cv:Suffix>
           <cv:Buffered>true</cv:Buffered>
           <cv:Overwrite>false</cv:Overwrite>
           <cv:FourCC>FMP4</cv:FourCC>
-          <cv:FrameRate>30</cv:FrameRate>
+          <cv:FrameRate>50</cv:FrameRate>
           <cv:FrameSize>
-            <cv:Width>0</cv:Width>
-            <cv:Height>0</cv:Height>
+            <cv:Width>1024</cv:Width>
+            <cv:Height>768</cv:Height>
           </cv:FrameSize>
           <cv:ResizeInterpolation>NearestNeighbor</cv:ResizeInterpolation>
         </Combinator>
+      </Expression>
+      <Expression xsi:type="ExternalizedMapping">
+        <Property Name="PortName" />
       </Expression>
       <Expression xsi:type="MemberSelector">
         <Selector>Quaternion</Selector>
@@ -72,10 +67,6 @@
           <dsp:Overwrite>false</dsp:Overwrite>
           <dsp:Layout>ColumnMajor</dsp:Layout>
         </Combinator>
-      </Expression>
-      <Expression xsi:type="Annotation">
-        <Name>Commutator</Name>
-        <Text><![CDATA[Uncomment to enable zero-torque commutator. Be sure to select the correct COM port for the commutator.]]></Text>
       </Expression>
       <Expression xsi:type="Disable">
         <Builder xsi:type="GroupWorkflow">
@@ -109,9 +100,9 @@
               <Expression xsi:type="WorkflowInput">
                 <Name>Source1</Name>
               </Expression>
-              <Expression xsi:type="ipy:PythonTransform">
-                <ipy:Name>Heading</ipy:Name>
-                <ipy:Script>import clr
+              <Expression xsi:type="p2:PythonTransform">
+                <p2:Name>Heading</p2:Name>
+                <p2:Script>import clr
 clr.AddReference("OpenCV.Net")
 from OpenCV.Net import *
 from math import atan2
@@ -123,7 +114,7 @@ def process(value):
   q2 = value[2].Val0;
   q3 = value[3].Val0;
 
-  return atan2((2 * (q0 * q3 + q1 * q2)), (1 - 2 * (q2**2 + q3**2)))</ipy:Script>
+  return atan2((2 * (q0 * q3 + q1 * q2)), (1 - 2 * (q2**2 + q3**2)))</p2:Script>
               </Expression>
               <Expression xsi:type="io:CsvWriter">
                 <io:FileName>heading_.csv</io:FileName>
@@ -149,8 +140,8 @@ def process(value):
               <Expression xsi:type="Combinator">
                 <Combinator xsi:type="rx:Zip" />
               </Expression>
-              <Expression xsi:type="ipy:PythonTransform">
-                <ipy:Script>from math import pi
+              <Expression xsi:type="p2:PythonTransform">
+                <p2:Script>from math import pi
 
 @returns(str)
 def process(value):
@@ -169,7 +160,7 @@ def process(value):
 
   turn = (p - last) / (2 * pi)
 
-  return "{turn : %s}" % turn</ipy:Script>
+  return "{turn : %s}" % turn</p2:Script>
               </Expression>
               <Expression xsi:type="Combinator">
                 <Combinator xsi:type="rx:Merge" />
@@ -206,33 +197,17 @@ def process(value):
           </Workflow>
         </Builder>
       </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>FrameNumber,Trigger</Selector>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="rx:Timestamp" />
-      </Expression>
-      <Expression xsi:type="io:CsvWriter">
-        <io:FileName>count-and-gate_.csv</io:FileName>
-        <io:Append>false</io:Append>
-        <io:Overwrite>false</io:Overwrite>
-        <io:Suffix>Timestamp</io:Suffix>
-        <io:IncludeHeader>false</io:IncludeHeader>
-        <io:Selector>Timestamp,Value.Item1,Value.Item2</io:Selector>
-      </Expression>
     </Nodes>
     <Edges>
-      <Edge From="0" To="2" Label="Source1" />
-      <Edge From="1" To="2" Label="Source2" />
+      <Edge From="0" To="1" Label="Source1" />
+      <Edge From="0" To="4" Label="Source1" />
+      <Edge From="0" To="7" Label="Source1" />
+      <Edge From="1" To="2" Label="Source1" />
       <Edge From="2" To="3" Label="Source1" />
-      <Edge From="2" To="5" Label="Source1" />
-      <Edge From="2" To="9" Label="Source1" />
-      <Edge From="3" To="4" Label="Source1" />
-      <Edge From="5" To="6" Label="Source1" />
-      <Edge From="6" To="8" Label="Source1" />
-      <Edge From="7" To="8" Label="Source2" />
-      <Edge From="9" To="10" Label="Source1" />
-      <Edge From="10" To="11" Label="Source1" />
+      <Edge From="4" To="5" Label="Source1" />
+      <Edge From="6" To="9" Label="Source1" />
+      <Edge From="7" To="8" Label="Source1" />
+      <Edge From="8" To="9" Label="Source2" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>

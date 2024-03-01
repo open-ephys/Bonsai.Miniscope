@@ -89,8 +89,18 @@ namespace Bonsai.Miniscope
                             try
                             {
                                 // Magik configuration sequence (configures SERDES and chip default states)
-                                Helpers.SendConfig(capture, Helpers.CreateCommand(192, 31, 16));
-                                Helpers.SendConfig(capture, Helpers.CreateCommand(176, 5, 32));
+                                // 8-bit            7-bit           Description
+                                // ---------------------------------------------
+                                // 192 (0xc0)       96 (0x60)       Deserializer
+                                // 176 (0xb0)       88 (0x58)       Serializer
+                                // 160 (0xa0)       80 (0x50)       TPL0102 Digital potentiometer
+                                // 80 (0x50)        40 (0x28)       BNO055
+                                // 254 (0xfe)       127 (0x7F)      ??
+                                // 238 (0xee)       119 (0x77)      MAX14574 EWL driver
+                                // 32 (0x20)        16 (0x10)       ATTINY MCU
+
+                                Helpers.SendConfig(capture, Helpers.CreateCommand(192, 31, 16)); // I2C: 0x60
+                                Helpers.SendConfig(capture, Helpers.CreateCommand(176, 5, 32)); // I2C:0x58
                                 Helpers.SendConfig(capture, Helpers.CreateCommand(192, 34, 2));
                                 Helpers.SendConfig(capture, Helpers.CreateCommand(192, 32, 10));
                                 Helpers.SendConfig(capture, Helpers.CreateCommand(192, 7, 176));
@@ -98,10 +108,10 @@ namespace Bonsai.Miniscope
                                 Helpers.SendConfig(capture, Helpers.CreateCommand(176, 30, 10));
                                 Helpers.SendConfig(capture, Helpers.CreateCommand(192, 8, 32, 238, 160, 80));
                                 Helpers.SendConfig(capture, Helpers.CreateCommand(192, 16, 32, 238, 88, 80));
-                                Helpers.SendConfig(capture, Helpers.CreateCommand(80, 65, 9, 5));
-                                Helpers.SendConfig(capture, Helpers.CreateCommand(80, 61, 12));
-                                Helpers.SendConfig(capture, Helpers.CreateCommand(254, 0));
-                                Helpers.SendConfig(capture, Helpers.CreateCommand(238, 3, 3));
+                                Helpers.SendConfig(capture, Helpers.CreateCommand(80, 65, 9, 5)); // BNO Axis mapping and sign
+                                Helpers.SendConfig(capture, Helpers.CreateCommand(80, 61, 12)); // BNO operation mode is NDOF
+                                Helpers.SendConfig(capture, Helpers.CreateCommand(254, 0)); // 0x7F
+                                Helpers.SendConfig(capture, Helpers.CreateCommand(238, 3, 3)); // 0x77
 
                                 // Set frame size
                                 capture.SetProperty(CaptureProperty.FrameWidth, WIDTH);
@@ -119,8 +129,8 @@ namespace Bonsai.Miniscope
                                     {
                                         if (!gate && lastLEDBrightness != 0)
                                         {
-                                            Helpers.SendConfig(capture, Helpers.CreateCommand(32, 1, (byte)(255)));
-                                            Helpers.SendConfig(capture, Helpers.CreateCommand(88, 0, 114, (byte)(255)));
+                                            Helpers.SendConfig(capture, Helpers.CreateCommand(32, 1, 255));
+                                            Helpers.SendConfig(capture, Helpers.CreateCommand(88, 0, 114, 255));
                                             lastLEDBrightness = 0;
                                         }
                                         else if (gate && LEDBrightness != lastLEDBrightness || !initialized)
