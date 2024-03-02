@@ -8,10 +8,9 @@ using System.Threading.Tasks;
 
 namespace Bonsai.Miniscope
 {
-    [Description("UCLA MiniCam behavioral monitoring camera.")]
+    [Description("UCLA MiniCAM behavioral monitoring camera.")]
     public class MiniCam : Source<MiniCamFrame>
     {
-
         public enum Gain
         {
             Low = 8,
@@ -28,10 +27,9 @@ namespace Bonsai.Miniscope
         };
 
         // Frame size
-        const int Width = 1024; //608;
-        const int Height = 768; //608;
+        const int Width = 1024;
+        const int Height = 768;
 
-        // Settings
         [Description("The index of the camera from which to acquire images.")]
         public int Index { get; set; } = 0;
 

@@ -11,9 +11,9 @@ namespace Bonsai.Miniscope
             Trigger = trigger;
         }
 
-        public int FrameNumber { get; private set; }
-        public IplImage Image { get; private set; }
-        public bool Trigger { get; private set; }
+        public int FrameNumber { get; }
+        public IplImage Image { get; }
+        public bool Trigger { get; }
 
     }
 }

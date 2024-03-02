@@ -28,10 +28,9 @@ namespace Bonsai.Miniscope
     public class UCLAMiniscopeV4 : Source<V4Frame>
     {
         // Frame size
-        const int WIDTH = 608;
-        const int HEIGHT = 608;
+        const int Width = 608;
+        const int Height = 608;
 
-        // Settings
         [Description("The index of the camera from which to acquire images.")]
         public int Index { get; set; } = 0;
 
@@ -61,14 +60,13 @@ namespace Bonsai.Miniscope
         readonly object captureLock = new object();
 
 
-        // Camera regiser abuse
-        //
-        // CaptureProperty.Saturation -> Quaternion W and start acqusition
-        // CaptureProperty.Hue -> Quaternion X
-        // CaptureProperty.Gain -> Quaternion Y
-        // CaptureProperty.Brightness -> Quaternion Z
-        // CaptureProperty.Gamma -> Inverted state of Trigger Input (3.3 -> Gamma = 0, 0V -> Gamma != 0)
-        // CaptureProperty.Contrast -> DAQ Frame number
+        // NB: Camera regiser (ab)uses
+        // CaptureProperty.Saturation   -> Quaternion W and start acqusition
+        // CaptureProperty.Hue          -> Quaternion X
+        // CaptureProperty.Gain         -> Quaternion Y
+        // CaptureProperty.Brightness   -> Quaternion Z
+        // CaptureProperty.Gamma        -> Inverted state of Trigger Input (3.3 -> Gamma = 0, 0V -> Gamma != 0)
+        // CaptureProperty.Contrast     -> DAQ Frame number
 
         public UCLAMiniscopeV4()
         {
@@ -114,8 +112,8 @@ namespace Bonsai.Miniscope
                                 Helpers.SendConfig(capture, Helpers.CreateCommand(238, 3, 3)); // 0x77
 
                                 // Set frame size
-                                capture.SetProperty(CaptureProperty.FrameWidth, WIDTH);
-                                capture.SetProperty(CaptureProperty.FrameHeight, HEIGHT);
+                                capture.SetProperty(CaptureProperty.FrameWidth, Width);
+                                capture.SetProperty(CaptureProperty.FrameHeight, Height);
 
                                 // Start the camera
                                 capture.SetProperty(CaptureProperty.Saturation, 1);
