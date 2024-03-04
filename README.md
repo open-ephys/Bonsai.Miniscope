@@ -1,4 +1,4 @@
-# NOTE: This library is now read-only. Development is now talking place on the [OpenEphys.Bonsai.Miniscope](https://github.com/open-ephys/OpenEphys.Bonsai.Miniscope) repo.
+# NOTE: This library is now read-only. Development is now taking place on the [OpenEphys.Bonsai.Miniscope](https://github.com/open-ephys/OpenEphys.Bonsai.Miniscope) repo.
 
 # Bonsai.Miniscope
 [Bonsai](http://bonsai-rx.org/) package for controlling and acquiring data from head-borne miniscopes for calcium imaging. 
